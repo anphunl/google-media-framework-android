@@ -429,9 +429,9 @@ public class ExoplayerWrapper implements ExoPlayer.Listener, ChunkSampleSource.E
     lastReportedPlaybackState = ExoPlayer.STATE_IDLE;
     rendererBuildingState = RENDERER_BUILDING_STATE_IDLE;
     trackStateForType = new int[RENDERER_COUNT];
-    // Disable text initially.
-    trackStateForType[TYPE_TEXT] = DISABLED_TRACK;
-    player.setSelectedTrack(TYPE_TEXT, TRACK_DISABLED);
+    // Use default track
+    trackStateForType[TYPE_TEXT] = PRIMARY_TRACK;
+    player.setSelectedTrack(TYPE_TEXT, PRIMARY_TRACK);
   }
 
   /**

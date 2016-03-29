@@ -41,4 +41,5 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.googlecode.juniversalchardet:juniversalchardet:1.0.3'
 }

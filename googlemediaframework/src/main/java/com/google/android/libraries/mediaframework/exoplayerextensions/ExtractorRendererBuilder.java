@@ -37,6 +37,8 @@ import android.media.AudioManager;
 import android.media.MediaCodec;
 import android.net.Uri;
 
+import java.net.URI;
+
 /**
  * A {@link RendererBuilder} for streams that can be read using an {@link Extractor}.
  */
@@ -45,39 +47,39 @@ public class ExtractorRendererBuilder implements RendererBuilder {
     private static final int BUFFER_SEGMENT_COUNT = 256;
 
     private final Context context;
-    private final String userAgent;
-    private final Uri uri;
+    private final Video video;
 
-    public ExtractorRendererBuilder(Context context, String userAgent, Uri uri) {
+    public ExtractorRendererBuilder(Context context, Video video) {
         this.context = context;
-        this.userAgent = userAgent;
-        this.uri = uri;
+        this.video = video;
     }
 
     @Override
     public void buildRenderers(ExoplayerWrapper player) {
         Allocator allocator = new DefaultAllocator(BUFFER_SEGMENT_SIZE);
 
-    // Build the video and audio renderers.
-    DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter(player.getMainHandler(),
-        null);
-    DataSource dataSource = new DefaultUriDataSource(context, bandwidthMeter, userAgent);
-    ExtractorSampleSource sampleSource = new ExtractorSampleSource(uri, dataSource, allocator,
-        BUFFER_SEGMENT_COUNT * BUFFER_SEGMENT_SIZE);
-    MediaCodecVideoTrackRenderer videoRenderer = new MediaCodecVideoTrackRenderer(context,
-        sampleSource, MediaCodecSelector.DEFAULT, MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT, 5000,
-        player.getMainHandler(), player, 50);
-    MediaCodecAudioTrackRenderer audioRenderer = new MediaCodecAudioTrackRenderer(sampleSource,
-        MediaCodecSelector.DEFAULT, null, true, player.getMainHandler(), player,
-        AudioCapabilities.getCapabilities(context), AudioManager.STREAM_MUSIC);
-    TrackRenderer textRenderer = new TextTrackRenderer(sampleSource, player,
-        player.getMainHandler().getLooper());
+        // Build the video and audio renderers.
+        DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter(player.getMainHandler(),
+                null);
+        DataSource dataSource = new DefaultUriDataSource(context, bandwidthMeter, video.getUserAgent());
+        ExtractorSampleSource sampleSource = new ExtractorSampleSource(Uri.parse(video.getUrl()), dataSource, allocator,
+                BUFFER_SEGMENT_COUNT * BUFFER_SEGMENT_SIZE);
+        MediaCodecVideoTrackRenderer videoRenderer = new MediaCodecVideoTrackRenderer(context,
+                sampleSource, MediaCodecSelector.DEFAULT, MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT, 5000,
+                player.getMainHandler(), player, 50);
+        MediaCodecAudioTrackRenderer audioRenderer = new MediaCodecAudioTrackRenderer(sampleSource,
+                MediaCodecSelector.DEFAULT, null, true, player.getMainHandler(), player,
+                AudioCapabilities.getCapabilities(context), AudioManager.STREAM_MUSIC);
+        TrackRenderer textRenderer = RendererBuilderFactory.getSubtitleTrack(video, context, bandwidthMeter, player);
 
         // Invoke the callback.
         TrackRenderer[] renderers = new TrackRenderer[ExoplayerWrapper.RENDERER_COUNT];
         renderers[ExoplayerWrapper.TYPE_VIDEO] = videoRenderer;
         renderers[ExoplayerWrapper.TYPE_AUDIO] = audioRenderer;
-        renderers[ExoplayerWrapper.TYPE_TEXT] = textRenderer;
+        if (textRenderer != null) {
+            renderers[ExoplayerWrapper.TYPE_TEXT] = textRenderer;
+        }
+
         player.onRenderers(renderers, bandwidthMeter);
     }
 

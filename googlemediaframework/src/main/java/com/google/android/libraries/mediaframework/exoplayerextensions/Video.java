@@ -51,7 +51,7 @@ public class Video {
 
     private Map<String, String> subtitlesMap;
 
-    private String userAgent;
+    private String userAgent = "Coichua";
 
     /**
      * @param url The URL pointing to the video.

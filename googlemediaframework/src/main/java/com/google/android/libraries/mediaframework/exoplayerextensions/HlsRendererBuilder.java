@@ -26,14 +26,18 @@ package com.google.android.libraries.mediaframework.exoplayerextensions;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaCodec;
+import android.net.Uri;
 import android.os.Handler;
 
+import com.google.android.exoplayer.C;
 import com.google.android.exoplayer.DefaultLoadControl;
 import com.google.android.exoplayer.LoadControl;
 import com.google.android.exoplayer.MediaCodecAudioTrackRenderer;
 import com.google.android.exoplayer.MediaCodecSelector;
 import com.google.android.exoplayer.MediaCodecUtil.DecoderQueryException;
 import com.google.android.exoplayer.MediaCodecVideoTrackRenderer;
+import com.google.android.exoplayer.MediaFormat;
+import com.google.android.exoplayer.SingleSampleSource;
 import com.google.android.exoplayer.TrackRenderer;
 import com.google.android.exoplayer.audio.AudioCapabilities;
 import com.google.android.exoplayer.chunk.VideoFormatSelectorUtil;
@@ -55,6 +59,7 @@ import com.google.android.exoplayer.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer.upstream.DefaultUriDataSource;
 import com.google.android.exoplayer.util.ManifestFetcher;
 import com.google.android.exoplayer.util.ManifestFetcher.ManifestCallback;
+import com.google.android.exoplayer.util.MimeTypes;
 import com.google.android.libraries.mediaframework.exoplayerextensions.ExoplayerWrapper.RendererBuilder;
 
 import java.io.IOException;
@@ -70,24 +75,23 @@ public class HlsRendererBuilder implements RendererBuilder {
     private static final int MAIN_BUFFER_SEGMENTS = 256;
     private static final int TEXT_BUFFER_SEGMENTS = 2;
 
+    private Video video;
+
     private final Context context;
-    private final String userAgent;
-    private final String url;
 
     private ExoplayerWrapper player;
 
     private AsyncRendererBuilder currentAsyncBuilder;
 
-    public HlsRendererBuilder(Context context, String userAgent, String url) {
+    public HlsRendererBuilder(Context context, Video video) {
         this.context = context;
-        this.userAgent = userAgent;
-        this.url = url;
+        this.video = video;
     }
 
     @Override
     public void buildRenderers(ExoplayerWrapper player) {
         this.player = player;
-        currentAsyncBuilder = new AsyncRendererBuilder(context, userAgent, url, player);
+        currentAsyncBuilder = new AsyncRendererBuilder(context, video, player);
         currentAsyncBuilder.init();
     }
 
@@ -102,20 +106,18 @@ public class HlsRendererBuilder implements RendererBuilder {
     private static final class AsyncRendererBuilder implements ManifestCallback<HlsPlaylist> {
 
         private final Context context;
-        private final String userAgent;
-        private final String url;
+        private final Video video;
         private final ExoplayerWrapper player;
         private final ManifestFetcher<HlsPlaylist> playlistFetcher;
 
         private boolean canceled;
 
-        public AsyncRendererBuilder(Context context, String userAgent, String url, ExoplayerWrapper player) {
+        public AsyncRendererBuilder(Context context, Video video, ExoplayerWrapper player) {
             this.context = context;
-            this.userAgent = userAgent;
-            this.url = url;
+            this.video = video;
             this.player = player;
             HlsPlaylistParser parser = new HlsPlaylistParser();
-            playlistFetcher = new ManifestFetcher<>(url, new DefaultUriDataSource(context, userAgent),
+            playlistFetcher = new ManifestFetcher<>(video.getUrl(), new DefaultUriDataSource(context, video.getUserAgent()),
                     parser);
         }
 
@@ -148,8 +150,8 @@ public class HlsRendererBuilder implements RendererBuilder {
             PtsTimestampAdjusterProvider timestampAdjusterProvider = new PtsTimestampAdjusterProvider();
 
             // Build the video/audio/metadata renderers.
-            DataSource dataSource = new DefaultUriDataSource(context, bandwidthMeter, userAgent);
-            HlsChunkSource chunkSource = new HlsChunkSource(true /* isMaster */, dataSource, url,
+            DataSource dataSource = new DefaultUriDataSource(context, bandwidthMeter, video.getUserAgent());
+            HlsChunkSource chunkSource = new HlsChunkSource(true /* isMaster */, dataSource, video.getUrl(),
                     manifest, DefaultHlsTrackSelector.newDefaultInstance(context), bandwidthMeter,
                     timestampAdjusterProvider, HlsChunkSource.ADAPTIVE_MODE_SPLICE);
             HlsSampleSource sampleSource = new HlsSampleSource(chunkSource, loadControl,
@@ -164,28 +166,16 @@ public class HlsRendererBuilder implements RendererBuilder {
                     sampleSource, new Id3Parser(), player, mainHandler.getLooper());
 
             // Build the text renderer, preferring Webvtt where available.
-            boolean preferWebvtt = false;
-            if (manifest instanceof HlsMasterPlaylist) {
-                preferWebvtt = !((HlsMasterPlaylist) manifest).subtitles.isEmpty();
-            }
-            TrackRenderer textRenderer;
-            if (preferWebvtt) {
-                DataSource textDataSource = new DefaultUriDataSource(context, bandwidthMeter, userAgent);
-                HlsChunkSource textChunkSource = new HlsChunkSource(false /* isMaster */, textDataSource,
-                        url, manifest, DefaultHlsTrackSelector.newVttInstance(), bandwidthMeter,
-                        timestampAdjusterProvider, HlsChunkSource.ADAPTIVE_MODE_SPLICE);
-                HlsSampleSource textSampleSource = new HlsSampleSource(textChunkSource, loadControl,
-                        TEXT_BUFFER_SEGMENTS * BUFFER_SEGMENT_SIZE, mainHandler, player, ExoplayerWrapper.TYPE_TEXT);
-                textRenderer = new TextTrackRenderer(textSampleSource, player, mainHandler.getLooper());
-            } else {
-                textRenderer = new Eia608TrackRenderer(sampleSource, player, mainHandler.getLooper());
-            }
+
+            TrackRenderer textRenderer = RendererBuilderFactory.getSubtitleTrack(video, context, bandwidthMeter, player);
 
             TrackRenderer[] renderers = new TrackRenderer[ExoplayerWrapper.RENDERER_COUNT];
             renderers[ExoplayerWrapper.TYPE_VIDEO] = videoRenderer;
             renderers[ExoplayerWrapper.TYPE_AUDIO] = audioRenderer;
             renderers[ExoplayerWrapper.TYPE_METADATA] = id3Renderer;
-            renderers[ExoplayerWrapper.TYPE_TEXT] = textRenderer;
+            if (textRenderer != null) {
+                renderers[ExoplayerWrapper.TYPE_TEXT] = textRenderer;
+            }
             player.onRenderers(renderers, bandwidthMeter);
         }
 

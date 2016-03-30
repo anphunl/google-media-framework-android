@@ -943,12 +943,5 @@ public class ExoplayerWrapper implements ExoPlayer.Listener, ChunkSampleSource.E
     }
   }
 
-//  /* package */ void processText(String text) {
-//    if (textListener == null || selectedTracks[TYPE_TEXT] == DISABLED_TRACK) {
-//      return;
-//    }
-//    textListener.onText(text);
-//  }
-
 
 }

@@ -237,14 +237,14 @@ public class ExoplayerWrapper implements ExoPlayer.Listener, ChunkSampleSource.E
   /**
    * A listener for receiving notifications of timed text.
    */
-  public interface TextListener {
-
-    /**
-     * Respond to text arriving (ex subtitles, captions).
-     * @param text The received text.
-     */
-    public abstract void onText(String text);
-  }
+//  public interface TextListener {
+//
+//    /**
+//     * Respond to text arriving (ex subtitles, captions).
+//     * @param text The received text.
+//     */
+//    public abstract void onText(String text);
+//  }
 
   /**
    * A listener for receiving ID3 metadata parsed from the media stream.
@@ -399,7 +399,7 @@ public class ExoplayerWrapper implements ExoPlayer.Listener, ChunkSampleSource.E
   /**
    * Respond to text (ex subtitle or closed captioning) events.
    */
-  private TextListener textListener;
+//  private TextListener textListener;
   private CaptionListener captionListener;
   private Id3MetadataListener id3MetadataListener;
 
@@ -487,9 +487,9 @@ public class ExoplayerWrapper implements ExoPlayer.Listener, ChunkSampleSource.E
    *
    * @param listener The listener which can respond to text like subtitles and captions.
    */
-  public void setTextListener(TextListener listener) {
-    textListener = listener;
-  }
+//  public void setTextListener(TextListener listener) {
+//    textListener = listener;
+//  }
 
   public void setMetadataListener(Id3MetadataListener listener) {
     id3MetadataListener = listener;
@@ -943,12 +943,12 @@ public class ExoplayerWrapper implements ExoPlayer.Listener, ChunkSampleSource.E
     }
   }
 
-  /* package */ void processText(String text) {
-    if (textListener == null || selectedTracks[TYPE_TEXT] == DISABLED_TRACK) {
-      return;
-    }
-    textListener.onText(text);
-  }
+//  /* package */ void processText(String text) {
+//    if (textListener == null || selectedTracks[TYPE_TEXT] == DISABLED_TRACK) {
+//      return;
+//    }
+//    textListener.onText(text);
+//  }
 
 
 }

@@ -114,7 +114,7 @@ public class SimpleVideoPlayer {
         video,
         layers);
 
-    layerManager.getExoplayerWrapper().setTextListener(subtitleLayer);
+    layerManager.getExoplayerWrapper().setCaptionListener(subtitleLayer);
 
     if (startPostitionMs > 0) {
       layerManager.getExoplayerWrapper().seekTo(startPostitionMs);

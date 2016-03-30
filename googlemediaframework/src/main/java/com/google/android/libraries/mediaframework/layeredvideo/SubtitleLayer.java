@@ -16,22 +16,27 @@
 
 package com.google.android.libraries.mediaframework.layeredvideo;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.google.android.exoplayer.text.Cue;
+import com.google.android.exoplayer.text.SubtitleLayout;
 import com.google.android.libraries.mediaframework.R;
 import com.google.android.libraries.mediaframework.exoplayerextensions.ExoplayerWrapper;
+
+import java.util.List;
 
 /**
  * Creates a view which displays subtitles.
  */
-public class SubtitleLayer implements Layer, ExoplayerWrapper.TextListener {
+public class SubtitleLayer implements Layer, ExoplayerWrapper.CaptionListener {
 
   /**
    * The text view that displays the subtitles.
    */
-  private TextView subtitles;
+  private SubtitleLayout subtitles;
 
   /**
    * The view that is created by this layer (it contains SubtitleLayer#subtitles).
@@ -43,9 +48,7 @@ public class SubtitleLayer implements Layer, ExoplayerWrapper.TextListener {
     LayoutInflater inflater = layerManager.getActivity().getLayoutInflater();
 
     view = (FrameLayout) inflater.inflate(R.layout.subtitle_layer, null);
-    subtitles = (TextView) view.findViewById(R.id.subtitles);
-
-    layerManager.getExoplayerWrapper().setTextListener(this);
+    subtitles = (SubtitleLayout) view.findViewById(R.id.subtitles);
     return view;
   }
 
@@ -58,10 +61,11 @@ public class SubtitleLayer implements Layer, ExoplayerWrapper.TextListener {
    * When subtitles arrive, display them in the text view.
    * @param text The subtitles that must be displayed.
    */
-  @Override
-  public void onText(String text) {
-    this.subtitles.setText(text);
-  }
+//  @Override
+//  public void onText(String text) {
+//      Log.i("Coichua", "Show subtitle " + text);
+//      this.subtitles.setText(text);
+//  }
 
   /**
    * Show or hide the subtitles.
@@ -71,4 +75,9 @@ public class SubtitleLayer implements Layer, ExoplayerWrapper.TextListener {
   public void setVisibility(int visibility) {
     view.setVisibility(visibility);
   }
+
+    @Override
+    public void onCues(List<Cue> cues) {
+        subtitles.setCues(cues);
+    }
 }

@@ -213,7 +213,7 @@ public class MainActivity extends Activity implements PlaybackControlLayer.Fulls
    * @return A list of videos (and their titles, content URLs, media types, content ID, and ad tag).
    */
   public VideoListItem[] getVideoListItems() {
-      Video video = new Video("http://plist.vn-hd.com/mp4v3/62ffa1f48bd274e7bddf9442e4f32d8c/ceb7a8cf16e2435e99323600bd745a4b/00000000000000000000000000000000/3972_320_480_i.smil/playlist.m3u8", Video.VideoType.HLS);
+      Video video = new Video("http://plist.vn-hd.com/mp4v3/fc082905803ad39b3e7e4260bc1f6ece/85b705a427d14fc49e3285effea07da1/00000000000000000000000000000000/3972_320_480_i.smil/playlist.m3u8", Video.VideoType.HLS);
       video.addSubtitle("VI", "http://s.vn-hd.com:8080/store_06_2013/15062013/Rio_2011_1080p_2D_Bluray_DTS_x264_DON/Rio_2011_1080p_2D_Bluray_DTS_x264_DON_VIE.srt");
     return new VideoListItem[] {
         new VideoListItem("No ads (HLS)",

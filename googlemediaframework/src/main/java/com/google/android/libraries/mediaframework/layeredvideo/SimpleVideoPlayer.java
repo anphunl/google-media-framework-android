@@ -107,6 +107,7 @@ public class SimpleVideoPlayer {
     List<Layer> layers = new ArrayList<Layer>();
     layers.add(videoSurfaceLayer);
     layers.add(playbackControlLayer);
+    layers.add(new PlayerLoadingLayer());
     layers.add(subtitleLayer);
 
     layerManager = new LayerManager(activity,

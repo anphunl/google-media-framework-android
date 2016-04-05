@@ -23,7 +23,6 @@ public class PlayerLoadingLayer implements Layer, ExoplayerWrapper.PlaybackListe
     }
 
     public void hideLoading() {
-        Log.i("Coichua", "Hide loading");
         progressBar.setVisibility(View.INVISIBLE);
     }
 

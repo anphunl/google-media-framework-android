@@ -16,13 +16,41 @@
 
 package com.google.android.libraries.mediaframework.exoplayerextensions;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Represents a video that can be played by Exoplayer.
  */
 public class Video {
+
+    public class Subtitle {
+        private String language;
+        private String url;
+
+        public Subtitle(String language, String url) {
+            this.language = language;
+            this.url = url;
+        }
+
+        public String getLanguage() {
+            return language;
+        }
+
+        public void setLanguage(String language) {
+            this.language = language;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
+        }
+    }
 
     /**
      * A list of available video formats which Exoplayer can play.
@@ -49,7 +77,7 @@ public class Video {
      */
     private final String contentId;
 
-    private Map<String, String> subtitlesMap;
+    private List<Subtitle> subtitles;
 
     private String userAgent = "Coichua";
 
@@ -102,26 +130,23 @@ public class Video {
     }
 
     public void addSubtitle(String language, String url) {
-        if (subtitlesMap == null) {
-            subtitlesMap = new HashMap<String, String>();
+        if (subtitles == null) {
+            subtitles = new ArrayList<Subtitle>();
         }
 
-        subtitlesMap.put(language, url);
+        subtitles.add(new Subtitle(language, url));
     }
 
     public int getNumberOfSubtitles() {
-        if (subtitlesMap == null) {
+        if (subtitles == null) {
             return 0;
         }
 
-        return subtitlesMap.size();
+        return subtitles.size();
     }
 
-    public String getSubtilteUrl(String language) {
-        return subtitlesMap.get(language);
-    }
 
-    public Map<String, String> getSubtitlesMap() {
-        return subtitlesMap;
+    public List<Subtitle> getSubtitlesList() {
+        return subtitles;
     }
 }

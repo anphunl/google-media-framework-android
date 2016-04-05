@@ -70,6 +70,7 @@ public class ExtractorRendererBuilder implements RendererBuilder {
         MediaCodecAudioTrackRenderer audioRenderer = new MediaCodecAudioTrackRenderer(sampleSource,
                 MediaCodecSelector.DEFAULT, null, true, player.getMainHandler(), player,
                 AudioCapabilities.getCapabilities(context), AudioManager.STREAM_MUSIC);
+
         TrackRenderer textRenderer = RendererBuilderFactory.getSubtitleTrack(video, context, bandwidthMeter, player);
 
         // Invoke the callback.

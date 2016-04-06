@@ -21,6 +21,7 @@ import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import com.google.android.exoplayer.text.CaptionStyleCompat;
 import com.google.android.libraries.mediaframework.exoplayerextensions.ExoplayerWrapper;
 import com.google.android.libraries.mediaframework.exoplayerextensions.Video;
 
@@ -65,6 +66,10 @@ public class SimpleVideoPlayer {
    * Set whether the video should play immediately.
    */
   private boolean autoplay;
+
+  public void setSubtitleStyle(CaptionStyleCompat style, float fontScale) {
+      subtitleLayer.configureSubtitleView(style, fontScale);
+  }
 
   /**
    * @param activity The activity that will contain the video player.

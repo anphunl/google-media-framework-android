@@ -16,12 +16,14 @@
 
 package com.google.android.libraries.mediaframework.layeredvideo;
 
-import android.util.Log;
+import android.annotation.TargetApi;
+import android.content.Context;
 import android.view.LayoutInflater;
+import android.view.accessibility.CaptioningManager;
 import android.widget.FrameLayout;
-import android.widget.TextView;
 
 import com.google.android.exoplayer.AspectRatioFrameLayout;
+import com.google.android.exoplayer.text.CaptionStyleCompat;
 import com.google.android.exoplayer.text.Cue;
 import com.google.android.exoplayer.text.SubtitleLayout;
 import com.google.android.libraries.mediaframework.R;
@@ -30,19 +32,19 @@ import com.google.android.libraries.mediaframework.exoplayerextensions.Exoplayer
 import java.util.List;
 
 /**
- * Creates a view which displays subtitles.
+ * Creates a view which displays subtitleLayout.
  */
 public class SubtitleLayer implements Layer, ExoplayerWrapper.CaptionListener {
 
     /**
-     * The text view that displays the subtitles.
+     * The text view that displays the subtitleLayout.
      */
-    private SubtitleLayout subtitles;
+    private SubtitleLayout subtitleLayout;
 
     private AspectRatioFrameLayout aspectRatioFrameLayout;
 
     /**
-     * The view that is created by this layer (it contains SubtitleLayer#subtitles).
+     * The view that is created by this layer (it contains SubtitleLayer#subtitleLayout).
      */
     private FrameLayout view;
 
@@ -69,12 +71,17 @@ public class SubtitleLayer implements Layer, ExoplayerWrapper.CaptionListener {
         LayoutInflater inflater = layerManager.getActivity().getLayoutInflater();
 
         view = (FrameLayout) inflater.inflate(R.layout.subtitle_layer, null);
-        subtitles = (SubtitleLayout) view.findViewById(R.id.subtitles);
+        subtitleLayout = (SubtitleLayout) view.findViewById(R.id.subtitles);
         aspectRatioFrameLayout = (AspectRatioFrameLayout) view.findViewById(R.id.video_subtitles_frame);
 
         layerManager.getExoplayerWrapper().addListener(playbackListener);
 
         return view;
+    }
+
+    public void configureSubtitleView(CaptionStyleCompat style, float fontScale) {
+        subtitleLayout.setStyle(style);
+        subtitleLayout.setFractionalTextSize(SubtitleLayout.DEFAULT_TEXT_SIZE_FRACTION * fontScale);
     }
 
     @Override
@@ -84,7 +91,7 @@ public class SubtitleLayer implements Layer, ExoplayerWrapper.CaptionListener {
 
 
     /**
-     * Show or hide the subtitles.
+     * Show or hide the subtitleLayout.
      * @param visibility One of {@link android.view.View#INVISIBLE},
      *                   {@link android.view.View#VISIBLE}, {@link android.view.View#GONE}.
      */
@@ -94,6 +101,6 @@ public class SubtitleLayer implements Layer, ExoplayerWrapper.CaptionListener {
 
     @Override
     public void onCues(List<Cue> cues) {
-        subtitles.setCues(cues);
+        subtitleLayout.setCues(cues);
     }
 }

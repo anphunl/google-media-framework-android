@@ -519,7 +519,7 @@ public class PlaybackControlLayer implements Layer, PlayerControlCallback {
 
     if (isFullscreen) {
       fullscreenCallback.onReturnFromFullscreen();
-      activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+//      activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
       // Make the status bar and navigation bar visible again.
       activity.getWindow().getDecorView().setSystemUiVisibility(0);
@@ -531,7 +531,7 @@ public class PlaybackControlLayer implements Layer, PlayerControlCallback {
       isFullscreen = false;
     } else {
       fullscreenCallback.onGoToFullscreen();
-      activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+//      activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
       activity.getWindow().getDecorView().setSystemUiVisibility(
           View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN);
